@@ -1,6 +1,8 @@
 import { Sequelize } from 'sequelize-typescript';
+import { Game } from 'src/modules/game/game.model';
 
 import { User } from 'src/modules/user/user.model';
+import { UserGame } from 'src/modules/user_game/user_game.model';
 
 export const DbModule = {
   provide: 'SEQUELIZE',
@@ -14,7 +16,7 @@ export const DbModule = {
       database: process.env.DB_NAME,
       ssl: true,
     });
-    sequelize.addModels([User]);
+    sequelize.addModels([User, Game, UserGame]);
     sequelize
       .sync({ alter: true, logging: true })
       .then(() => {
