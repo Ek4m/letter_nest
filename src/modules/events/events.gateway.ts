@@ -7,8 +7,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { PlayerService } from '../user_game/player.service';
-
-const users: any[] = [];
+import { JoinGameDto } from './game.dto';
 
 @WebSocketGateway()
 export class ChatGateway {
@@ -16,22 +15,32 @@ export class ChatGateway {
   @WebSocketServer()
   server: Server;
 
-  handleConnection() {
-    console.log('USER CONNECTED');
+  handleConnection(client: Socket) {
+    client.emit('is_online', client.id);
   }
 
   async handleDisconnect(client: Socket) {
-    const roomName = await this.playerService.removePlayerFromGame(client.id);
-    client.leave(roomName);
+    const { room, userId } = await this.playerService.removePlayerFromGame(
+      client.id,
+    );
+    client.leave(room);
+    this.server.to(room).emit('user_disconnected', userId);
   }
 
   @SubscribeMessage('join_game')
-  handleEnterGame(
-    @MessageBody() name: string,
+  async handleEnterGame(
+    @MessageBody() body: JoinGameDto,
     @ConnectedSocket() client: Socket,
   ) {
-    users.push({ id: client.id });
-    this.server.in(client.id).socketsJoin(name);
-    this.server.to(name).emit('game_state', users);
+    const { gameStarted } = await this.playerService.enterToRoom(
+      body.gameId,
+      body.userId,
+    );
+    const roomName = body.gameId.toString();
+    this.server.in(client.id).socketsJoin(roomName);
+    this.server.to(roomName).emit('user_connected', body.userId);
+    if (gameStarted) {
+      this.server.to(roomName).emit('game_started', body.userId);
+    }
   }
 }

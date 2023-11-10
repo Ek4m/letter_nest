@@ -23,6 +23,9 @@ export class Game extends Model {
   @Column({ type: DataType.STRING, defaultValue: GameStatus.PENDING })
   state: GameStatus;
 
+  @Column({ type: DataType.BOOLEAN, defaultValue: false })
+  isStarted: boolean;
+
   @Column({ type: DataType.DATE })
   startsAt: Date;
 

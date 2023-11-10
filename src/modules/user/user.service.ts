@@ -79,11 +79,11 @@ export class UserService {
   async login(user: User) {
     const refresh_token = this.jwtService.sign(
       { id: user.id },
-      { expiresIn: `5d` },
+      { expiresIn: `10d` },
     );
     const access_token = this.jwtService.sign(
       { email: user.email },
-      { expiresIn: '1h' },
+      { expiresIn: '5d' },
     );
     return { access_token, refresh_token };
   }
