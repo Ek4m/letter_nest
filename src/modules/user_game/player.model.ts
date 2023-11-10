@@ -24,6 +24,11 @@ export class UserGame extends Model {
   @BelongsTo(() => User)
   user: Game;
 
+  @Column({
+    type: DataType.STRING,
+  })
+  socketId: number;
+
   @Column({ type: DataType.BOOLEAN, defaultValue: false })
   isAdmin: boolean;
 

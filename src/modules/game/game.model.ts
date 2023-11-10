@@ -7,7 +7,7 @@ import {
   Table,
 } from 'sequelize-typescript';
 import { GameStatus } from './game_state.enum';
-import { UserGame } from '../user_game/user_game.model';
+import { UserGame } from '../user_game/player.model';
 
 @Table
 export class Game extends Model {
@@ -17,7 +17,7 @@ export class Game extends Model {
   })
   name: string;
 
-  @Column({ type: DataType.INTEGER })
+  @Column({ type: DataType.INTEGER, defaultValue: 4 })
   numberOfUsers: number;
 
   @Column({ type: DataType.STRING, defaultValue: GameStatus.PENDING })

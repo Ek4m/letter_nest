@@ -2,7 +2,7 @@ import { Sequelize } from 'sequelize-typescript';
 import { Game } from 'src/modules/game/game.model';
 
 import { User } from 'src/modules/user/user.model';
-import { UserGame } from 'src/modules/user_game/user_game.model';
+import { UserGame } from 'src/modules/user_game/player.model';
 
 export const DbModule = {
   provide: 'SEQUELIZE',

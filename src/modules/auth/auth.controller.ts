@@ -4,6 +4,7 @@ import {
   Get,
   Post,
   Request,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { UserService } from '../user/user.service';
@@ -15,10 +16,16 @@ import {
 } from '../user/user.dto';
 import { LocalAuthGuard } from './local.guard';
 import { JwtGuard } from './jwt.guard';
+import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
   constructor(private userService: UserService) {}
+
+  @Get('/')
+  async getHTMLPage(@Res() res: Response) {
+    res.sendFile(`${process.cwd()}/index.html`);
+  }
 
   @Post('/register')
   async register(@Body() body: RegisterDto) {
