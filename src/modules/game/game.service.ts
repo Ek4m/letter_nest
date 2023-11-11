@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Game } from '../game/game.model';
+// import { Op } from 'sequelize';
 
 @Injectable()
 export class GameService {
@@ -17,6 +18,16 @@ export class GameService {
 
   async create(name: string) {
     const game = await Game.create({ name });
+    return game;
+  }
+
+  async getActiveGames() {
+    const game = await Game.findAll({
+      where: {
+        // isStarted: { [Op.eq]: true },
+        // isFinished: { [Op.eq]: false },
+      },
+    });
     return game;
   }
 }

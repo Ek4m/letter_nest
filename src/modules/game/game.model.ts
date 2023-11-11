@@ -17,7 +17,7 @@ export class Game extends Model {
   })
   name: string;
 
-  @Column({ type: DataType.INTEGER, defaultValue: 4 })
+  @Column({ type: DataType.INTEGER, defaultValue: 0 })
   numberOfUsers: number;
 
   @Column({ type: DataType.STRING, defaultValue: GameStatus.PENDING })
@@ -25,6 +25,9 @@ export class Game extends Model {
 
   @Column({ type: DataType.BOOLEAN, defaultValue: false })
   isStarted: boolean;
+
+  @Column({ type: DataType.BOOLEAN, defaultValue: false })
+  isFinished: boolean;
 
   @Column({ type: DataType.DATE })
   startsAt: Date;
