@@ -8,6 +8,7 @@ import {
 } from 'sequelize-typescript';
 import { GameStatus } from './game_state.enum';
 import { UserGame } from '../user_game/player.model';
+import { LoveLetterCard } from 'src/constants/cards';
 
 @Table
 export class Game extends Model {
@@ -34,6 +35,17 @@ export class Game extends Model {
 
   @Column({ type: DataType.DATE })
   endsAt: Date;
+
+  @Column({
+    type: DataType.JSON,
+    set(val: any) {
+      this.setDataValue('cards', JSON.stringify(val));
+    },
+    get() {
+      return JSON.parse(this.getDataValue('cards'));
+    },
+  })
+  cards: LoveLetterCard[];
 
   @HasMany(() => UserGame)
   users: UserGame[];

@@ -8,31 +8,39 @@ export class PlayerService {
   constructor(private gameService: GameService) {}
 
   async removePlayerFromGame(socketId: string) {
+    console.log('______SOCKET ID', socketId);
     const player = await UserGame.findOne({
       where: { socketId },
       include: [{ model: Game }],
     });
-    const room = player.game.name;
-    await this.gameService.incrementUsers(player.game.id);
+    const room = player.game.id;
+    await this.gameService.decrementUsers(player.game.id);
     await player.destroy({ force: true });
     return { room, userId: player.userId };
   }
 
-  async enterToRoom(gameId: number, userId: number) {
+  async enterToRoom(gameId: number, userId: number, socketId: string) {
     const game = await this.gameService.getOne(gameId);
-    if (game.numberOfUsers < 4) {
-      await UserGame.create({
-        gameId,
-        userId,
-      });
-      await game.increment('numberOfUsers');
-    }
     let gameStarted = false;
-    if (game.numberOfUsers === 4 && !game.isStarted) {
-      game.isStarted = true;
-      gameStarted = true;
+    const alreadyInLobby = await UserGame.findOne({
+      where: { userId, gameId, socketId },
+    });
+    if (!alreadyInLobby) {
+      if (game.numberOfUsers < 4) {
+        console.log('____CREATED');
+        await UserGame.create({
+          gameId,
+          userId,
+          socketId,
+        });
+        await game.increment('numberOfUsers');
+      }
+      if (game.numberOfUsers === 4 && !game.isStarted) {
+        gameStarted = true;
+        game.isStarted = true;
+      }
+      await game.save();
     }
-    await game.save();
-    return { game, gameStarted };
+    return { game, gameStarted, alreadyInLobby };
   }
 }

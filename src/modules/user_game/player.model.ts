@@ -27,7 +27,7 @@ export class UserGame extends Model {
   @Column({
     type: DataType.STRING,
   })
-  socketId: number;
+  socketId: string;
 
   @Column({ type: DataType.BOOLEAN, defaultValue: false })
   isAdmin: boolean;
