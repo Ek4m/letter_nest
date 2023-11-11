@@ -2,7 +2,6 @@ import {
   Column,
   DataType,
   DeletedAt,
-  IsEmail,
   Model,
   Table,
 } from 'sequelize-typescript';
@@ -11,7 +10,6 @@ import { UserRole } from './user.enum';
 
 @Table
 export class User extends Model {
-  @IsEmail
   @Column({
     type: DataType.STRING,
     allowNull: false,
