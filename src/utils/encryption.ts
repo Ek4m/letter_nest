@@ -5,7 +5,7 @@ export class Encryption {
   };
 
   static hashPassword = (pswd: string) => {
-    const salt = this.generateSalt(30);
+    const salt = this.generateSalt(10);
     const hashed = bcrypt.hashSync(pswd, salt);
     return hashed;
   };

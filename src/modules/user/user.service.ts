@@ -45,12 +45,6 @@ export class UserService {
     return user;
   }
 
-  async create(body: UserDto) {
-    const user = await User.create({ ...body });
-    await user.save();
-    return user;
-  }
-
   async delete(id: string) {
     await User.destroy({ where: { id } });
   }
@@ -70,8 +64,7 @@ export class UserService {
   }
 
   async register(body: RegisterDto) {
-    const user = User.build({ ...body });
-    await user.save();
+    const user = await User.create({ ...body });
     delete user.password;
     return user;
   }
