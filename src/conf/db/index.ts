@@ -18,7 +18,7 @@ export const DbModule = {
     });
     sequelize.addModels([User, Game, UserGame]);
     sequelize
-      .sync({ alter: true, logging: true })
+      .sync({ alter: true, logging: false })
       .then(() => {
         console.log('DB Connected!');
       })

@@ -6,6 +6,7 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+
 import { PlayerService } from '../user_game/player.service';
 import { JoinGameDto } from './game.dto';
 
@@ -20,12 +21,12 @@ export class ChatGateway {
   }
 
   async handleDisconnect(client: Socket) {
+    console.log('EXITING CLIENT ID', client.id);
     const { room, userId } = await this.playerService.removePlayerFromGame(
       client.id,
     );
-    console.log('ROOM ' + room);
     client.leave(room);
-    client.broadcast.emit('user_disconnected', userId);
+    this.server.to(room).emit('user_connected', userId);
   }
 
   @SubscribeMessage('join_game')
@@ -36,14 +37,26 @@ export class ChatGateway {
     const { game, gameStarted, alreadyInLobby } =
       await this.playerService.enterToRoom(body.gameId, body.userId, client.id);
     const roomName = body.gameId.toString();
-    if (game.numberOfUsers >= 4) {
+    if (game.numberOfUsers >= 3) {
       this.server.to(roomName).emit('room_full');
     } else {
       if (!alreadyInLobby) {
         this.server.in(client.id).socketsJoin(roomName);
-        this.server.to(roomName).emit('user_connected', body.userId);
+        const gameCopy = game.get();
+        this.server
+          .to(roomName)
+          .emit('user_connected', { userId: body.userId, game: gameCopy });
         if (gameStarted) {
-          this.server.to(roomName).emit('game_started', body.userId);
+          const { players, cards } = await this.playerService.drawCards(game);
+          gameCopy.users = players;
+          game.cards = cards;
+          gameCopy.cards = cards;
+          game.startsAt = new Date();
+          await game.save();
+          this.server.to(roomName).emit('game_started');
+          setTimeout(() => {
+            this.server.to(roomName).emit('game_state', gameCopy);
+          }, 2000);
         }
       } else {
         this.server.to(roomName).emit('already_in_room');

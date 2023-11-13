@@ -9,6 +9,7 @@ import {
 } from 'sequelize-typescript';
 import { User } from '../user/user.model';
 import { Game } from '../game/game.model';
+import { LoveLetterCard } from 'src/constants';
 
 @Table({ timestamps: true })
 export class UserGame extends Model {
@@ -28,6 +29,18 @@ export class UserGame extends Model {
     type: DataType.STRING,
   })
   socketId: string;
+
+  @Column({
+    type: DataType.TEXT('medium'),
+    set(val: any) {
+      this.setDataValue('cards', JSON.stringify(val));
+    },
+    get() {
+      const cardArray = JSON.parse(this.getDataValue('cards'));
+      return cardArray;
+    },
+  })
+  cards: LoveLetterCard[];
 
   @Column({ type: DataType.BOOLEAN, defaultValue: false })
   isAdmin: boolean;

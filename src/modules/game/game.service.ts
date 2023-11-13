@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Game } from '../game/game.model';
+import { GameCards } from 'src/constants';
+import { shuffleArray } from 'src/utils';
 // import { Op } from 'sequelize';
 
 @Injectable()
@@ -17,7 +19,9 @@ export class GameService {
   }
 
   async create(name: string) {
-    const game = await Game.create({ name });
+    const game = Game.build({ name });
+    game.cards = shuffleArray(GameCards);
+    await game.save();
     return game;
   }
 

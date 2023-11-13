@@ -8,7 +8,7 @@ import {
 } from 'sequelize-typescript';
 import { GameStatus } from './game_state.enum';
 import { UserGame } from '../user_game/player.model';
-import { LoveLetterCard } from 'src/constants/cards';
+import { LoveLetterCard } from 'src/constants';
 
 @Table
 export class Game extends Model {
@@ -37,7 +37,7 @@ export class Game extends Model {
   endsAt: Date;
 
   @Column({
-    type: DataType.JSON,
+    type: DataType.TEXT('medium'),
     set(val: any) {
       this.setDataValue('cards', JSON.stringify(val));
     },

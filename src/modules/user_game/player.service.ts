@@ -13,10 +13,13 @@ export class PlayerService {
       where: { socketId },
       include: [{ model: Game }],
     });
-    const room = player.game.id;
-    await this.gameService.decrementUsers(player.game.id);
-    await player.destroy({ force: true });
-    return { room, userId: player.userId };
+    console.log('EXITING PLAYER', player);
+    if (player) {
+      const room = player.game.id;
+      await this.gameService.decrementUsers(player.game.id);
+      await player.destroy({ force: true });
+      return { room, userId: player.userId };
+    }
   }
 
   async enterToRoom(gameId: number, userId: number, socketId: string) {
@@ -26,8 +29,7 @@ export class PlayerService {
       where: { userId, gameId, socketId },
     });
     if (!alreadyInLobby) {
-      if (game.numberOfUsers < 4) {
-        console.log('____CREATED');
+      if (game.numberOfUsers < 3) {
         await UserGame.create({
           gameId,
           userId,
@@ -35,12 +37,26 @@ export class PlayerService {
         });
         await game.increment('numberOfUsers');
       }
-      if (game.numberOfUsers === 4 && !game.isStarted) {
+      console.log(game.get());
+      if (game.numberOfUsers === 2 && !game.isStarted) {
         gameStarted = true;
         game.isStarted = true;
       }
       await game.save();
     }
     return { game, gameStarted, alreadyInLobby };
+  }
+
+  async drawCards(game: Game) {
+    const players = await UserGame.findAll({ where: { gameId: game.id } });
+    const cards = game.cards;
+    console.log('____CARDS', cards);
+    for (const player of players) {
+      player.cards = cards.splice(0, 2);
+      await player.save();
+    }
+    game.cards = cards;
+    await game.save();
+    return { players, cards };
   }
 }
