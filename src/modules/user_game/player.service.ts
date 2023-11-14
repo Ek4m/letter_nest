@@ -8,14 +8,12 @@ export class PlayerService {
   constructor(private gameService: GameService) {}
 
   async removePlayerFromGame(socketId: string) {
-    console.log('______SOCKET ID', socketId);
     const player = await UserGame.findOne({
       where: { socketId },
       include: [{ model: Game }],
     });
-    console.log('EXITING PLAYER', player);
     if (player) {
-      const room = player.game.id;
+      const room = player.game.id.toString();
       await this.gameService.decrementUsers(player.game.id);
       await player.destroy({ force: true });
       return { room, userId: player.userId };

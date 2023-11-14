@@ -21,12 +21,11 @@ export class ChatGateway {
   }
 
   async handleDisconnect(client: Socket) {
-    console.log('EXITING CLIENT ID', client.id);
     const { room, userId } = await this.playerService.removePlayerFromGame(
       client.id,
     );
+    this.server.to(room).emit('user_disconnected', userId);
     client.leave(room);
-    this.server.to(room).emit('user_connected', userId);
   }
 
   @SubscribeMessage('join_game')
