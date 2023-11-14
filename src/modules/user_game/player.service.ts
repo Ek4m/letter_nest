@@ -48,9 +48,13 @@ export class PlayerService {
   async drawCards(game: Game) {
     const players = await UserGame.findAll({ where: { gameId: game.id } });
     const cards = game.cards;
-    console.log('____CARDS', cards);
+    let first = false;
     for (const player of players) {
       player.cards = cards.splice(0, 2);
+      if (first === false) {
+        first = true;
+        player.turn = true;
+      }
       await player.save();
     }
     game.cards = cards;

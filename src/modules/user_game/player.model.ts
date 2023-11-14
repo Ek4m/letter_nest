@@ -42,8 +42,23 @@ export class UserGame extends Model {
   })
   cards: LoveLetterCard[];
 
+  @Column({
+    type: DataType.TEXT('medium'),
+    set(val: any) {
+      this.setDataValue('drawedCards', JSON.stringify(val));
+    },
+    get() {
+      const cardArray = JSON.parse(this.getDataValue('drawedCards'));
+      return cardArray;
+    },
+  })
+  drawedCards: LoveLetterCard[];
+
   @Column({ type: DataType.BOOLEAN, defaultValue: false })
   isAdmin: boolean;
+
+  @Column({ type: DataType.BOOLEAN, defaultValue: false })
+  turn: boolean;
 
   @DeletedAt
   deletedAt: Date;
